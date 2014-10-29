@@ -147,9 +147,13 @@ def state(
         fail_minions = [fail_minions]
 
     for minion, mdata in cmd_ret.iteritems():
-        if mdata['out'] != 'highstate':
-            log.warning("Output from salt state not highstate")
-        m_ret = mdata['ret']
+        if not cmd_kw['ssh']:
+            if mdata['out'] != 'highstate':
+                log.warning("Output from salt state not highstate")
+        if cmd_kw['ssh']:
+            m_ret = mdata
+        else:
+            m_ret = mdata['ret']
         m_state = salt.utils.check_state_result({minion: m_ret})
         if not m_state:
             if minion not in fail_minions:
